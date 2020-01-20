@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    The DBus interface of qemu expose to ffgpu device.
+-->
+<node name="/org/ffgpu/qemu">
+  <interface name="org.ffgpu.qemu">
+
+    <!--
+	For device to read host's physical memory
+    -->
+    <method name="read-host-memory">
+      <arg name="address" direction="in" type="t" />
+      <arg name="size" direction="in" type="t" />
+      <arg name="data" direction="out" type="ay" >
+	<annotation name="org.gtk.GDBus.C.ForceVariant" value="true" />
+      </arg>
+    </method>
+
+    <!--
+	For device to write host's physical memory
+    -->
+    <method name="write-host-memory">
+      <arg name="address" direction="in" type="t" />
+      <arg name="size" direction="in" type="t" />
+      <arg name="data" direction="in" type="ay" >
+	<annotation name="org.gtk.GDBus.C.ForceVariant" value="true" />
+      </arg>
+    </method>
+
+    <!--
+	For device to assert a interrupt to host
+    -->
+    <method name="assert-interrupt">
+      <arg name="vector" direction="in" type="i" />
+    </method>
+
+  </interface>
+</node>

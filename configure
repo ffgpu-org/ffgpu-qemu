@@ -349,6 +349,8 @@ unset target_list_exclude
 # Distributions want to ensure that several features are compiled in, and it
 # is impossible without a --enable-foo that exits if a feature is not found.
 
+ffgpu="no"
+ffgpu_dbus_xml=""
 bluez=""
 brlapi=""
 curl=""
@@ -1030,6 +1032,8 @@ for opt do
   ;;
   --with-trace-file=*) trace_file="$optarg"
   ;;
+  --with-ffgpu-dbus-xml=*) ffgpu_dbus_xml="$optarg"
+  ;;
   --with-default-devices) default_devices="yes"
   ;;
   --without-default-devices) default_devices="no"
@@ -1078,6 +1082,10 @@ for opt do
   --disable-sdl) sdl="no"
   ;;
   --enable-sdl) sdl="yes"
+  ;;
+  --disable-ffgpu) ffgpu="no"
+  ;;
+  --enable-ffgpu) ffgpu="yes"
   ;;
   --disable-sdl-image) sdl_image="no"
   ;;
@@ -1756,6 +1764,7 @@ disabled with --disable-FEATURE, default is enabled if available:
   debug-tcg       TCG debugging (default is disabled)
   debug-info      debugging information
   sparse          sparse checker
+  ffgpu           ffgpu device
 
   gnutls          GNUTLS cryptography support
   nettle          nettle cryptography support
@@ -6266,6 +6275,22 @@ EOF
   fi
 fi
 
+# Probe for gio-unix
+if test $ffgpu != "no" ; then
+  if test -z $ffgpu_dbus_xml ; then
+	error_exit "Please provide ffgpu DBus Interface XML: --with-ffgpu-dbus-xml=[xml]"
+  fi
+  if $pkg_config --atleast-version=$glib_req_ver gio-unix-2.0 ; then
+    gio_unix=yes
+    gio_unix_cflags=$($pkg_config --cflags gio-unix-2.0)
+    gio_unix_libs=$($pkg_config --libs gio-unix-2.0)
+  else
+    gio_unix=no
+    error_exit "Need gio-unix when ffgpu enabled."  
+  fi
+fi
+
+
 # Check that the C++ compiler exists and works with the C compiler.
 # All the QEMU_CXXFLAGS are based on QEMU_CFLAGS. Keep this at the end to don't miss any other that could be added.
 if has $cxx; then
@@ -6481,6 +6506,7 @@ echo "docker            $docker"
 echo "libpmem support   $libpmem"
 echo "libudev           $libudev"
 echo "default devices   $default_devices"
+echo "FFGPU support     $ffgpu"
 
 if test "$supported_cpu" = "no"; then
     echo
@@ -6551,6 +6577,9 @@ echo "GIT_UPDATE=$git_update" >> $config_host_mak
 
 echo "ARCH=$ARCH" >> $config_host_mak
 
+if test "$ffgpu" = "yes" ; then
+  echo "CONFIG_FFGPU=y" >> $config_host_mak
+fi
 if test "$default_devices" = "yes" ; then
   echo "CONFIG_MINIKCONF_MODE=--defconfig" >> $config_host_mak
 else
@@ -6830,6 +6859,11 @@ if test "$gio" = "yes" ; then
     echo "CONFIG_GIO=y" >> $config_host_mak
     echo "GIO_CFLAGS=$gio_cflags" >> $config_host_mak
     echo "GIO_LIBS=$gio_libs" >> $config_host_mak
+fi
+if test "$gio_unix" = "yes" ; then
+    echo "CONFIG_GIO_UNIX=y" >> $config_host_mak
+    echo "GIO_UNIX_CFLAGS=$gio_unix_cflags" >> $config_host_mak
+    echo "GIO_UNIX_LIBS=$gio_unix_libs" >> $config_host_mak
 fi
 echo "CONFIG_TLS_PRIORITY=\"$tls_priority\"" >> $config_host_mak
 if test "$gnutls" = "yes" ; then
