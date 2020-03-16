@@ -151,6 +151,8 @@ generated-files-y += $(TRACE_SOURCES)
 generated-files-y += $(BUILD_DIR)/trace-events-all
 generated-files-y += .git-submodule-status
 
+generated-files-$(CONFIG_FFGPU) += hw/ffgpu/generated-qemu-intf.c hw/ffgpu/generated-qemu-intf.h
+
 trace-group-name = $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/g')
 
 tracetool-y = $(SRC_PATH)/scripts/tracetool.py

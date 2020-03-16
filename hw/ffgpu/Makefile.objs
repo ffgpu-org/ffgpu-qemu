@@ -1,9 +1,25 @@
 # -*- mode: makefile -*-
 
 common-obj-$(CONFIG_FFGPU) += ffgpu.mo
-ffgpu.mo-objs := pcidev.o
+ffgpu.mo-objs := pcidev.o generated-qemu-intf.o
 ffgpu.mo-cflags := $(GIO_CFLAGS) $(GIO_UNIX_CFLAGS)
 ffgpu.mo-libs := $(GIO_LIBS) $(GIO_UNIX_LIBS)
 
 
+$(obj)/generated-qemu-intf.h: $(obj)/generated-qemu-intf.h-timestamp
+	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
+$(obj)/generated-qemu-intf.h-timestamp: $(SRC_PATH)/hw/ffgpu/org.ffgpu.qemu.xml
+	$(call quiet-command,gdbus-codegen \
+					--header --output $@ \
+					--c-namespace ffgpu \
+					--interface-prefix org.ffgpu.qemu $<, \
+					"GEN", "$(patsubst %-timestamp,%,$@)")
 
+$(obj)/generated-qemu-intf.c: $(obj)/generated-qemu-intf.c-timestamp
+	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
+$(obj)/generated-qemu-intf.c-timestamp: $(SRC_PATH)/hw/ffgpu/org.ffgpu.qemu.xml
+	$(call quiet-command,gdbus-codegen \
+					--body --output $@ \
+					--c-namespace ffgpu \
+					--interface-prefix org.ffgpu.qemu $<, \
+					"GEN", "$(patsubst %-timestamp,%,$@)")

@@ -350,7 +350,7 @@ unset target_list_exclude
 # is impossible without a --enable-foo that exits if a feature is not found.
 
 ffgpu="no"
-ffgpu_dbus_xml=""
+ffgpu_fmod_xml=""
 bluez=""
 brlapi=""
 curl=""
@@ -1032,7 +1032,7 @@ for opt do
   ;;
   --with-trace-file=*) trace_file="$optarg"
   ;;
-  --with-ffgpu-dbus-xml=*) ffgpu_dbus_xml="$optarg"
+  --with-ffgpu-fmod-xml=*) ffgpu_fmod_xml="$optarg"
   ;;
   --with-default-devices) default_devices="yes"
   ;;
@@ -6277,8 +6277,8 @@ fi
 
 # Probe for gio-unix
 if test $ffgpu != "no" ; then
-  if test -z $ffgpu_dbus_xml ; then
-	error_exit "Please provide ffgpu DBus Interface XML: --with-ffgpu-dbus-xml=[xml]"
+  if test -z $ffgpu_fmod_xml ; then
+	error_exit "Please provide ffgpu fmod Interface XML: --with-ffgpu-fmod-xml=[xml]"
   fi
   if $pkg_config --atleast-version=$glib_req_ver gio-unix-2.0 ; then
     gio_unix=yes
@@ -6579,6 +6579,7 @@ echo "ARCH=$ARCH" >> $config_host_mak
 
 if test "$ffgpu" = "yes" ; then
   echo "CONFIG_FFGPU=y" >> $config_host_mak
+  echo "CONFIG_FMOD_XML=`realpath $ffgpu_fmod_xml`" >> $config_host_mak
 fi
 if test "$default_devices" = "yes" ; then
   echo "CONFIG_MINIKCONF_MODE=--defconfig" >> $config_host_mak

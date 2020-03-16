@@ -2,7 +2,7 @@
 
 ffgpu_conf()
 {
-    OPTS=" --enable-gtk --enable-vte --enable-virtfs --enable-kvm --enable-ffgpu "
+    OPTS=" --enable-gtk --enable-vte --enable-virtfs --enable-kvm --enable-ffgpu --with-ffgpu-fmod-xml=../ffgpu-fmod/org.ffgpu.fmod.xml "
     OPTS+=" --disable-user --disable-sdl --target-list=x86_64-softmmu "
     echo "configure with $OPTS"
     ./configure $OPTS
