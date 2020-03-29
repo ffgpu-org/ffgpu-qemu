@@ -30,14 +30,12 @@
 #include "qemu/module.h"
 #include "qapi/visitor.h"
 
+#include "ffgpudev.h"
+
 #define TYPE_PCI_FFGPU_DEVICE "ffgpu"
 #define FFGPU(obj)        OBJECT_CHECK(FFGPUState, obj, TYPE_PCI_FFGPU_DEVICE)
+#define PCI_DEVICE_ID_FFGPU     0x1e1e
 
-typedef struct {
-    PCIDevice pdev;
-    MemoryRegion mmio;
-
-} FFGPUState;
 
 
 static void pci_ffgpu_realize(PCIDevice *pdev, Error **errp)
@@ -65,8 +63,8 @@ static void ffgpu_class_init(ObjectClass *class, void *data)
     k->realize = pci_ffgpu_realize;
     k->exit = pci_ffgpu_uninit;
     k->vendor_id = PCI_VENDOR_ID_QEMU;
-    k->device_id = 0x11e8;
-    k->revision = 0x10;
+    k->device_id = PCI_DEVICE_ID_FFGPU;
+    k->revision = 0x0;
     k->class_id = PCI_CLASS_DISPLAY_3D;
     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
 }
@@ -77,7 +75,7 @@ static void pci_ffgpu_register_types(void)
         { INTERFACE_PCIE_DEVICE },
         { },
     };
-    static const TypeInfo edu_info = {
+    static const TypeInfo ffgpu_info = {
         .name          = TYPE_PCI_FFGPU_DEVICE,
         .parent        = TYPE_PCI_DEVICE,
         .instance_size = sizeof(FFGPUState),
@@ -86,6 +84,6 @@ static void pci_ffgpu_register_types(void)
         .interfaces = interfaces,
     };
 
-    type_register_static(&edu_info);
+    type_register_static(&ffgpu_info);
 }
 type_init(pci_ffgpu_register_types)
