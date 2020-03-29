@@ -12,7 +12,7 @@ $(obj)/generated-qemu-intf.h-timestamp: $(SRC_PATH)/hw/ffgpu/org.ffgpu.qemu.xml
 	$(call quiet-command,gdbus-codegen \
 					--header --output $@ \
 					--c-namespace ffgpu \
-					--interface-prefix org.ffgpu.qemu $<, \
+					--interface-prefix org.ffgpu $<, \
 					"GEN", "$(patsubst %-timestamp,%,$@)")
 
 $(obj)/generated-qemu-intf.c: $(obj)/generated-qemu-intf.c-timestamp
@@ -21,5 +21,23 @@ $(obj)/generated-qemu-intf.c-timestamp: $(SRC_PATH)/hw/ffgpu/org.ffgpu.qemu.xml
 	$(call quiet-command,gdbus-codegen \
 					--body --output $@ \
 					--c-namespace ffgpu \
-					--interface-prefix org.ffgpu.qemu $<, \
+					--interface-prefix org.ffgpu $<, \
+					"GEN", "$(patsubst %-timestamp,%,$@)")
+
+$(obj)/generated-fmod-intf.h: $(obj)/generated-fmod-intf.h-timestamp
+	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
+$(obj)/generated-fmod-intf.h-timestamp: $(CONFIG_FMOD_XML)
+	$(call quiet-command,gdbus-codegen \
+					--header --output $@ \
+					--c-namespace ffgpu \
+					--interface-prefix org.ffgpu $<, \
+					"GEN", "$(patsubst %-timestamp,%,$@)")
+
+$(obj)/generated-fmod-intf.c: $(obj)/generated-fmod-intf.c-timestamp
+	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
+$(obj)/generated-fmod-intf.c-timestamp: $(CONFIG_FMOD_XML)
+	$(call quiet-command,gdbus-codegen \
+					--body --output $@ \
+					--c-namespace ffgpu \
+					--interface-prefix org.ffgpu $<, \
 					"GEN", "$(patsubst %-timestamp,%,$@)")
