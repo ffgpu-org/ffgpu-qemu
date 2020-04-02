@@ -30,33 +30,35 @@
 #include "qemu/module.h"
 #include "qapi/visitor.h"
 
+#include "dbusif.h"
 #include "ffgpudev.h"
 
 #define TYPE_PCI_FFGPU_DEVICE "ffgpu"
-#define FFGPU(obj)        OBJECT_CHECK(FFGPUState, obj, TYPE_PCI_FFGPU_DEVICE)
-#define PCI_DEVICE_ID_FFGPU     0x1e1e
+#define FFGPU(obj) OBJECT_CHECK(FFGPUState, obj, TYPE_PCI_FFGPU_DEVICE)
+#define PCI_DEVICE_ID_FFGPU 0x1e1e
 
-
-
-static void pci_ffgpu_realize(PCIDevice *pdev, Error **errp)
-{
-
-
+static void pci_ffgpu_realize(PCIDevice *pdev, Error **errp) {
+    FFGPUState *ffgpu = FFGPU(pdev);
+    init_dbus_intf(ffgpu);
 }
 
-static void pci_ffgpu_uninit(PCIDevice *pdev)
-{
-
-
+static void pci_ffgpu_uninit(PCIDevice *pdev) {
+    FFGPUState *ffgpu = FFGPU(pdev);
+    deinit_dbus_intf(ffgpu);
 }
 
-static void ffgpu_instance_init(Object *obj)
-{
-
+static void ffgpu_instance_init(Object *obj) {
 }
 
-static void ffgpu_class_init(ObjectClass *class, void *data)
-{
+static void ffgpu_instance_finalize(Object *obj) {
+}
+
+static Property ffgpu_properties[] = {
+    DEFINE_PROP_STRING("host-dbus-name", FFGPUState, host_dbus_name),
+    DEFINE_PROP_STRING("fmod-dbus-name", FFGPUState, fmod_dbus_name),
+    DEFINE_PROP_END_OF_LIST()};
+
+static void ffgpu_class_init(ObjectClass *class, void *data) {
     DeviceClass *dc = DEVICE_CLASS(class);
     PCIDeviceClass *k = PCI_DEVICE_CLASS(class);
 
@@ -67,23 +69,24 @@ static void ffgpu_class_init(ObjectClass *class, void *data)
     k->revision = 0x0;
     k->class_id = PCI_CLASS_DISPLAY_3D;
     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+    dc->props = ffgpu_properties;
 }
 
-static void pci_ffgpu_register_types(void)
-{
+static void pci_ffgpu_register_types(void) {
     static InterfaceInfo interfaces[] = {
-        { INTERFACE_PCIE_DEVICE },
-        { },
+        {INTERFACE_PCIE_DEVICE},
+        {},
     };
     static const TypeInfo ffgpu_info = {
-        .name          = TYPE_PCI_FFGPU_DEVICE,
-        .parent        = TYPE_PCI_DEVICE,
+        .name = TYPE_PCI_FFGPU_DEVICE,
+        .parent = TYPE_PCI_DEVICE,
         .instance_size = sizeof(FFGPUState),
         .instance_init = ffgpu_instance_init,
-        .class_init    = ffgpu_class_init,
+        .instance_finalize = ffgpu_instance_finalize,
+        .class_init = ffgpu_class_init,
         .interfaces = interfaces,
     };
 
     type_register_static(&ffgpu_info);
 }
-type_init(pci_ffgpu_register_types)
+type_init(pci_ffgpu_register_types);
