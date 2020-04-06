@@ -1,7 +1,7 @@
 # -*- mode: makefile -*-
 
 common-obj-$(CONFIG_FFGPU) += ffgpu.mo
-ffgpu.mo-objs := pcidev.o generated-qemu-intf.o generated-fmod-intf.o dbusif.o
+ffgpu.mo-objs := ffgpudev.o generated-qemu-intf.o generated-fmod-intf.o dbusif.o
 ffgpu.mo-cflags := $(GIO_CFLAGS) $(GIO_UNIX_CFLAGS)
 ffgpu.mo-libs := $(GIO_LIBS) $(GIO_UNIX_LIBS)
 
