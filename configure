@@ -453,6 +453,8 @@ gettext=""
 bogus_os="no"
 malloc_trim="auto"
 
+ffgpu="no"
+
 # parse CC options first
 for opt do
   optarg=$(expr "x$opt" : 'x[^=]*=\(.*\)')
@@ -1525,6 +1527,10 @@ for opt do
   ;;
   --disable-libdaxctl) libdaxctl=no
   ;;
+  --enable-ffgpu) ffgpu=yes
+  ;;
+  --disable-ffgpu) ffgpu=no
+  ;;
   *)
       echo "ERROR: unknown option $opt"
       echo "Try '$0 --help' for more information"
@@ -1850,6 +1856,7 @@ disabled with --disable-FEATURE, default is enabled if available:
   xkbcommon       xkbcommon support
   rng-none        dummy RNG, avoid using /dev/(u)random and getrandom()
   libdaxctl       libdaxctl support
+  ffgpu           FFGPU support
 
 NOTE: The object files are built at the place where configure is launched
 EOF
@@ -6832,6 +6839,10 @@ fi
 
 if test "$safe_stack" = "yes"; then
   echo "CONFIG_SAFESTACK=y" >> $config_host_mak
+fi
+
+if test "$ffgpu" = "yes"; then
+  echo "CONFIG_FFGPU=y" >> $config_host_mak
 fi
 
 # If we're using a separate build tree, set it up now.
